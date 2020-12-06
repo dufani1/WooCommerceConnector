@@ -5,12 +5,16 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 from .exceptions import woocommerceError
 from .sync_orders import sync_orders, close_synced_woocommerce_orders
 from .sync_customers import sync_customers
 from .sync_products import sync_products, update_item_stock_qty
 from .utils import disable_woocommerce_sync_on_exception, make_woocommerce_log
 from frappe.utils.background_jobs import enqueue
+
 
 @frappe.whitelist()
 def check_hourly_sync():
