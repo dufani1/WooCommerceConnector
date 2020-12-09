@@ -46,7 +46,7 @@ def get_woocommerce_order_status_for_import():
     status_list = []
     _status_list = frappe.db.sql("""SELECT `status` FROM `tabWooCommerce SO Status`""", as_dict=True)
     for status in _status_list:
-        status_list.append(status.status)
+        status_list.append(status.status.strip().replace(" ", "-").lower())
     return status_list
 
 def valid_customer_and_product(woocommerce_order):
