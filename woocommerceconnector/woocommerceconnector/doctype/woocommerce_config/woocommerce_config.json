@@ -7,7 +7,7 @@
   "status_html",
   "enable_woocommerce",
   "verify_ssl",
-  "hourly_sync",
+  "periodic_sync",
   "app_type",
   "column_break_4",
   "last_sync_datetime",
@@ -83,15 +83,10 @@
    "label": "Verify SSL"
   },
   {
-   "default": "0",
-   "fieldname": "hourly_sync",
-   "fieldtype": "Check",
-   "label": "Hourly synchronization"
-  },
-  {
    "default": "Public",
    "fieldname": "app_type",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "App Type",
    "options": "Public\nPrivate",
    "reqd": 1
@@ -135,11 +130,13 @@
   {
    "fieldname": "webhook_address",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Webhook Address"
   },
   {
    "fieldname": "access_token",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Access Token"
   },
   {
@@ -382,10 +379,18 @@
    "fieldtype": "Table",
    "label": "WooCommerce SO Status for Import",
    "options": "WooCommerce SO Status"
+  },
+  {
+   "default": "Disabled",
+   "description": "Sync WooCommerce every x minute.",
+   "fieldname": "periodic_sync",
+   "fieldtype": "Select",
+   "label": "Periodical synchronization",
+   "options": "Disabled\n1\n5\n10\n30\n60"
   }
  ],
  "issingle": 1,
- "modified": "2020-12-14 16:42:11.387563",
+ "modified": "2020-12-15 13:58:48.053157",
  "modified_by": "Administrator",
  "module": "WooCommerceConnector",
  "name": "WooCommerce Config",

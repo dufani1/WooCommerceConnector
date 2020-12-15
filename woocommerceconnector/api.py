@@ -16,10 +16,24 @@ from .utils import disable_woocommerce_sync_on_exception, make_woocommerce_log
 from frappe.utils.background_jobs import enqueue
 
 
-@frappe.whitelist()
-def check_hourly_sync():
-    woocommerce_settings = frappe.get_doc("WooCommerce Config")
-    if woocommerce_settings.hourly_sync == 1:
+def periodic_sync_hook_5min():
+    if frappe.get_doc("WooCommerce Config").periodic_sync == "5":
+        sync_woocommerce()
+
+def periodic_sync_hook_10min():
+    if frappe.get_doc("WooCommerce Config").periodic_sync == "10":
+        sync_woocommerce()
+        
+def periodic_sync_hook_20min():
+    if frappe.get_doc("WooCommerce Config").periodic_sync == "20":
+        sync_woocommerce()
+        
+def periodic_sync_hook_30min():
+    if frappe.get_doc("WooCommerce Config").periodic_sync == "30":
+        sync_woocommerce()
+
+def periodic_sync_hook_60min():
+    if frappe.get_doc("WooCommerce Config").periodic_sync == "60":
         sync_woocommerce()
 
 @frappe.whitelist()
