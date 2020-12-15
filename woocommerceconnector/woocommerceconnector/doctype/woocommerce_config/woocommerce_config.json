@@ -92,8 +92,6 @@
    "default": "Public",
    "fieldname": "app_type",
    "fieldtype": "Select",
-   "hidden": 1,
-   "in_list_view": 1,
    "label": "App Type",
    "options": "Public\nPrivate",
    "reqd": 1
@@ -137,15 +135,12 @@
   {
    "fieldname": "webhook_address",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Webhook Address"
   },
   {
    "fieldname": "access_token",
    "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Access Token",
-   "read_only": 1
+   "label": "Access Token"
   },
   {
    "fieldname": "erp_settings",
@@ -390,7 +385,7 @@
   }
  ],
  "issingle": 1,
- "modified": "2020-10-19 11:05:14.087879",
+ "modified": "2020-12-14 16:42:11.387563",
  "modified_by": "Administrator",
  "module": "WooCommerceConnector",
  "name": "WooCommerce Config",

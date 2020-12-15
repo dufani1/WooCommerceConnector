@@ -39,8 +39,9 @@ def sync_woocommerce_orders():
                         else:
                             make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_orders", message=frappe.get_traceback(),
                                 request_data=woocommerce_order, exception=True)
+            sync_woocommerce_so_status_to_erpnext(so)
             # close this order as synced
-            close_synced_woocommerce_order(woocommerce_order.get("id"))
+            # close_synced_woocommerce_order(woocommerce_order.get("id"))
                 
 def get_woocommerce_order_status_for_import():
     status_list = []
@@ -451,3 +452,29 @@ def close_synced_woocommerce_order(wooid):
     except requests.exceptions.HTTPError as e:
         make_woocommerce_log(title=e.message, status="Error", method="close_synced_woocommerce_order", message=frappe.get_traceback(),
             request_data=woocommerce_order, exception=True)
+
+def sync_woocommerce_so_status_to_erpnext(so_name):
+    so = frappe.get_doc("Sales Order", so_name)
+    status = so.get("status")
+    delivery_status = so.get("delivery_status")
+    billing_status = so.get("billing_status")
+
+    if status == "To Deliver and Bill" and delivery_status == "Partly Delivered":
+        data = {
+            "status": "partly-delivered"
+        }
+        try:
+            put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+        except e:
+            print(e)
+            # make_woocommerce_log(title="")
+    elif status == "To Bill":
+        data = {
+            "status": "fully-delivered"
+        }
+        try:
+            put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+        except e:
+            print(e)
+            # make_woocommerce_log(title="")
+    print("done")
