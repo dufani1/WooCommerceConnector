@@ -454,27 +454,34 @@ def close_synced_woocommerce_order(wooid):
             request_data=woocommerce_order, exception=True)
 
 def sync_woocommerce_so_status_to_erpnext(so_name):
-    so = frappe.get_doc("Sales Order", so_name)
-    status = so.get("status")
-    delivery_status = so.get("delivery_status")
-    billing_status = so.get("billing_status")
+    if so_name:
+        so = frappe.get_doc("Sales Order", so_name)
+        status = so.get("status")
+        delivery_status = so.get("delivery_status")
+        billing_status = so.get("billing_status")
 
-    if status == "To Deliver and Bill" and delivery_status == "Partly Delivered":
-        data = {
-            "status": "partly-delivered"
-        }
-        try:
-            put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
-        except e:
-            print(e)
-            # make_woocommerce_log(title="")
-    elif status == "To Bill":
-        data = {
-            "status": "fully-delivered"
-        }
-        try:
-            put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
-        except e:
-            print(e)
-            # make_woocommerce_log(title="")
-    print("done")
+        if status == "To Deliver and Bill" and delivery_status == "Partly Delivered":
+            data = {
+                "status": "partly-delivered"
+            }
+            try:
+                put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+            except e:
+                make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_so_status_to_erpnext", message=frappe.get_traceback(), exception=True)
+        elif status == "To Bill":
+            data = {
+                "status": "fully-delivered"
+            }
+            try:
+                put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+            except e:
+                make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_so_status_to_erpnext", message=frappe.get_traceback(), exception=True)
+
+        elif status == "Completed" and delivery_status == "Fully Delivered" and billing_status == "Fully Billed":
+            data = {
+                "status": "completed"
+            }
+            try:
+                put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+            except e:
+                make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_so_status_to_erpnext", message=frappe.get_traceback(), exception=True)
