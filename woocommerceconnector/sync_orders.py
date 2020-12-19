@@ -39,8 +39,9 @@ def sync_woocommerce_orders():
                         else:
                             make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_orders", message=frappe.get_traceback(),
                                 request_data=woocommerce_order, exception=True)
+            sync_woocommerce_so_status_to_erpnext(so)
             # close this order as synced
-            close_synced_woocommerce_order(woocommerce_order.get("id"))
+            # close_synced_woocommerce_order(woocommerce_order.get("id"))
                 
 def get_woocommerce_order_status_for_import():
     status_list = []
@@ -183,6 +184,10 @@ def create_sales_order(woocommerce_order, woocommerce_settings, company=None):
 
     so = frappe.db.get_value("Sales Order", {"woocommerce_order_id": woocommerce_order.get("id")}, "name")
     if not so:
+        # get shipping/billing address
+        shipping_address = get_customer_address_from_order('Shipping', woocommerce_order, customer)
+        billing_address = get_customer_address_from_order('Billing', woocommerce_order, customer)
+
         # get applicable tax rule from configuration
         tax_rules = frappe.get_all("WooCommerce Tax Rule", filters={'currency': woocommerce_order.get("currency")}, fields=['tax_rule'])
         if not tax_rules:
@@ -209,7 +214,9 @@ def create_sales_order(woocommerce_order, woocommerce_settings, company=None):
             #"apply_discount_on": "Net Total",
             #"discount_amount": flt(woocommerce_order.get("discount_total") or 0),
             "currency": woocommerce_order.get("currency"),
-            "taxes_and_charges": tax_rules
+            "taxes_and_charges": tax_rules,
+            "customer_address": billing_address,
+            "shipping_address_name": shipping_address
         })
 
         so.flags.ignore_mandatory = True
@@ -234,6 +241,41 @@ def create_sales_order(woocommerce_order, woocommerce_settings, company=None):
     make_woocommerce_log(title="create sales order", status="Success", method="create_sales_order",
             message= "create sales_order",request_data=woocommerce_order, exception=False)
     return so
+
+def get_customer_address_from_order(type, woocommerce_order, customer):
+    address_record = woocommerce_order[type.lower()]
+    address_name = frappe.db.get_value("Address", {"woocommerce_address_id": type, "address_line1": address_record.get("address_1"), "woocommerce_company_name": address_record.get("company") or ''}, "name")
+    if not address_name:
+        country = get_country_name(address_record.get("country"))
+        if not frappe.db.exists("Country", country):
+            country = "Switzerland"
+        try :
+            address_name = frappe.get_doc({
+                "doctype": "Address",
+                "woocommerce_address_id": type,
+                "woocommerce_company_name": address_record.get("company") or '',
+                "address_title": customer,
+                "address_type": type,
+                "address_line1": address_record.get("address_1") or "Address 1",
+                "address_line2": address_record.get("address_2"),
+                "city": address_record.get("city") or "City",
+                "state": address_record.get("state"),
+                "pincode": address_record.get("postcode"),
+                "country": country,
+                "phone": address_record.get("phone"),
+                "email_id": address_record.get("email"),
+                "links": [{
+                    "link_doctype": "Customer",
+                    "link_name": customer
+                }]
+            }).insert()
+            address_name = address_name.name
+
+        except Exception as e:
+            make_woocommerce_log(title=e, status="Error", method="create_customer_address", message=frappe.get_traceback(),
+                    request_data=woocommerce_customer, exception=True)
+
+    return address_name
 
 def create_sales_invoice(woocommerce_order, woocommerce_settings, so):
     if not frappe.db.get_value("Sales Invoice", {"woocommerce_order_id": woocommerce_order.get("id")}, "name")\
@@ -410,3 +452,36 @@ def close_synced_woocommerce_order(wooid):
     except requests.exceptions.HTTPError as e:
         make_woocommerce_log(title=e.message, status="Error", method="close_synced_woocommerce_order", message=frappe.get_traceback(),
             request_data=woocommerce_order, exception=True)
+
+def sync_woocommerce_so_status_to_erpnext(so_name):
+    if so_name:
+        so = frappe.get_doc("Sales Order", so_name)
+        status = so.get("status")
+        delivery_status = so.get("delivery_status")
+        billing_status = so.get("billing_status")
+
+        if status == "To Deliver and Bill" and delivery_status == "Partly Delivered":
+            data = {
+                "status": "partly-delivered"
+            }
+            try:
+                put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+            except e:
+                make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_so_status_to_erpnext", message=frappe.get_traceback(), exception=True)
+        elif status == "To Bill":
+            data = {
+                "status": "fully-delivered"
+            }
+            try:
+                put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+            except e:
+                make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_so_status_to_erpnext", message=frappe.get_traceback(), exception=True)
+
+        elif status == "Completed" and delivery_status == "Fully Delivered" and billing_status == "Fully Billed":
+            data = {
+                "status": "completed"
+            }
+            try:
+                put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+            except e:
+                make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_so_status_to_erpnext", message=frappe.get_traceback(), exception=True)

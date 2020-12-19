@@ -145,13 +145,13 @@ def get_header(settings):
 """
 
 def get_filtering_condition():
-    woocommerce_settings = get_woocommerce_settings()
-    if woocommerce_settings.last_sync_datetime:
+    # woocommerce_settings = get_woocommerce_settings()
+    # if woocommerce_settings.last_sync_datetime:
 
-        last_sync_datetime = get_datetime(woocommerce_settings.last_sync_datetime)
+    #     last_sync_datetime = get_datetime(woocommerce_settings.last_sync_datetime)
         
-        #uncomment for live
-        return "after={0}".format(last_sync_datetime.isoformat() )
+    #     #uncomment for live
+    #     return "after={0}".format(last_sync_datetime.isoformat() )
     return ''
 
 
@@ -162,8 +162,8 @@ def get_woocommerce_items(ignore_filter_conditions=False):
     woocommerce_products = []
 
     filter_condition = ''
-    if not ignore_filter_conditions:
-        filter_condition = get_filtering_condition()
+    # if not ignore_filter_conditions:
+    #     filter_condition = get_filtering_condition()
 
     response = get_request_request('products?per_page={0}&{1}'.format(_per_page,filter_condition) )
     woocommerce_products.extend(response.json())
@@ -212,8 +212,8 @@ def get_woocommerce_orders(ignore_filter_conditions=False):
 
     filter_condition = ''
 
-    if not ignore_filter_conditions:
-        filter_condition = get_filtering_condition()
+    # if not ignore_filter_conditions:
+    #     filter_condition = get_filtering_condition()
     
     response = get_request_request('orders?per_page={0}&{1}'.format(_per_page,filter_condition))
     woocommerce_orders.extend(response.json())
