@@ -133,5 +133,5 @@ def get_log_status():
 def sync_woocommerce_ids():
     "Enqueue longjob for syncing woocommerce"
     # enqueue("woocommerceconnector.sync_products.add_w_id_to_erp", queue='long', timeout=1500)
-    from .sync_products import add_w_id_to_erp; add_w_id_to_erp()
+    # from .sync_products import add_w_id_to_erp; add_w_id_to_erp()
     # frappe.msgprint(_("Queued for syncing. It may take a few minutes to an hour if this is your first sync."))
