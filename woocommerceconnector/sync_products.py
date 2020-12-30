@@ -82,7 +82,7 @@ def create_item(woocommerce_item, warehouse, has_variant=0, attributes=None, var
         "image": get_item_image(woocommerce_item),
         "weight_uom": weight_unit, #woocommerce_item.get("weight_unit"),
         "weight_per_unit": woocommerce_item.get("weight"),
-        "web_long_description": woocommerce_item.get("description") or woocommerce_item.get("name")
+        "web_long_description": woocommerce_item.get("description") or woocommerce_item.get("name"),
         #"uoms": get_conversion_table(attributes, woocommerce_settings) if not has_variant else []
     }
     
@@ -111,7 +111,9 @@ def create_item(woocommerce_item, warehouse, has_variant=0, attributes=None, var
             
             new_item = frappe.get_doc(item_dict)
             new_item.insert()
+            new_item.item_defaults[0].default_warehouse = woocommerce_item.get("meta_data")[0]["value"]
             name = new_item.name
+            new_item.save()
 
         else:
             update_item(item_details, item_dict)
@@ -119,7 +121,7 @@ def create_item(woocommerce_item, warehouse, has_variant=0, attributes=None, var
 
         if not has_variant:
             add_to_price_list(woocommerce_item, name)
-    
+            
         frappe.db.commit()
         
 def get_item_code(woocommerce_item, woocommerce_settings):
