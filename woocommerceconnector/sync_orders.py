@@ -485,3 +485,20 @@ def sync_woocommerce_so_status_to_erpnext(so_name):
                 put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
             except e:
                 make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_so_status_to_erpnext", message=frappe.get_traceback(), exception=True)
+        elif status == "On Hold":
+            data = {
+                "status": "on-hold"
+            }
+            try:
+                put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+            except e:
+                make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_so_status_to_erpnext", message=frappe.get_traceback(), exception=True)
+
+        elif status == "Closed":
+            data = {
+                "status": "completed"
+            }
+            try:
+                put_request("orders/{0}".format(so.get("woocommerce_order_id")), data)
+            except e:
+                make_woocommerce_log(title=e.message, status="Error", method="sync_woocommerce_so_status_to_erpnext", message=frappe.get_traceback(), exception=True)

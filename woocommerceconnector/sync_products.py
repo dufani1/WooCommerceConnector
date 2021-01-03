@@ -111,7 +111,8 @@ def create_item(woocommerce_item, warehouse, has_variant=0, attributes=None, var
             
             new_item = frappe.get_doc(item_dict)
             new_item.insert()
-            new_item.item_defaults[0].default_warehouse = woocommerce_item.get("meta_data")[0]["value"]
+            if woocommerce_item.get("meta_data")[0]["value"]:
+                new_item.item_defaults[0].default_warehouse = woocommerce_item.get("meta_data")[0]["value"]
             name = new_item.name
             new_item.save()
 
