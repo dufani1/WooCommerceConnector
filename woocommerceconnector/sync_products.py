@@ -82,7 +82,7 @@ def create_item(woocommerce_item, warehouse, has_variant=0, attributes=None, var
         "image": get_item_image(woocommerce_item),
         "weight_uom": weight_unit, #woocommerce_item.get("weight_unit"),
         "weight_per_unit": woocommerce_item.get("weight"),
-        "web_long_description": woocommerce_item.get("description") or woocommerce_item.get("name")
+        "web_long_description": woocommerce_item.get("description") or woocommerce_item.get("name"),
         #"uoms": get_conversion_table(attributes, woocommerce_settings) if not has_variant else []
     }
     
