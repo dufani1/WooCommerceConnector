@@ -9,8 +9,6 @@
   "verify_ssl",
   "periodic_sync",
   "app_type",
-  "column_break_4",
-  "last_sync_datetime",
   "section_break_2",
   "woocommerce_url",
   "sync_timeout",
@@ -89,16 +87,6 @@
    "label": "App Type",
    "options": "Public\nPrivate",
    "reqd": 1
-  },
-  {
-   "fieldname": "column_break_4",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "last_sync_datetime",
-   "fieldtype": "Datetime",
-   "label": "Last Sync Datetime",
-   "read_only": 1
   },
   {
    "fieldname": "section_break_2",
@@ -387,7 +375,7 @@
   }
  ],
  "issingle": 1,
- "modified": "2021-01-02 07:46:47.299360",
+ "modified": "2021-03-28 10:15:18.627777",
  "modified_by": "Administrator",
  "module": "WooCommerceConnector",
  "name": "WooCommerce Config",

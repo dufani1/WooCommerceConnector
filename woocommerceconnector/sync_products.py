@@ -111,10 +111,7 @@ def create_item(woocommerce_item, warehouse, has_variant=0, attributes=None, var
             
             new_item = frappe.get_doc(item_dict)
             new_item.insert()
-            if woocommerce_item.get("meta_data")[0]["value"]:
-                new_item.item_defaults[0].default_warehouse = woocommerce_item.get("meta_data")[0]["value"]
             name = new_item.name
-            new_item.save()
 
         else:
             update_item(item_details, item_dict)
@@ -122,7 +119,7 @@ def create_item(woocommerce_item, warehouse, has_variant=0, attributes=None, var
 
         if not has_variant:
             add_to_price_list(woocommerce_item, name)
-            
+    
         frappe.db.commit()
         
 def get_item_code(woocommerce_item, woocommerce_settings):
